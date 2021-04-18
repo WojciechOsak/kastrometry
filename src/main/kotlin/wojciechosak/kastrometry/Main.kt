@@ -9,10 +9,9 @@ import kravis.*
 fun main() {
     val skyMap = Map(testDataSet1)
     val searchedShape = testShape2
-    //val imageProcessor = ImageProcessor("/img/DSC_0739.JPG")
-
+    val imageProcessor = ImageProcessor("/img/DSC_0739.JPG")
     measureTimeMillis {
-        val result = skyMap.find(searchedShape)
+        val result = skyMap.find(searchedShape.toHashSet())
         println("Best fit: ${result.last().first.stars} with similarity coefficient: ${result.last().second}")
     }.also {
         //plotSearchedShape(searchedShape)

@@ -5,16 +5,18 @@ import kravis.*
 import wojciechosak.kastrometry.comparator.StarsGroupComparator
 
 /**
- * Representation of night sky map.
+ * Representation of sky map.
  * Map can group all stars into smaller groups, each of them will have [groupSize] elements.
  * After grouping map is ready to find specific stars pattern with [find] method.
+ * Should be loaded once per program instance, consider to create many instances of Map objects with different groupSize
+ * to keep searching with most used group sizes, like 3-20 (most of constellations) and run finding on many threads.
  *
  * @param stars - list of stars. It is loaded from stars sets like Gaia.
  * @param groupSize - size of stars group that will be
  */
 class Map(private val stars: List<Star>, private val groupSize: Int = -1) {
 
-    private val groups: MutableList<StarsGroup> = arrayListOf()
+    private val groups: HashSet<StarsGroup> = hashSetOf()
 
     companion object {
         private const val PLOT_TITLE = "Map"
@@ -28,19 +30,19 @@ class Map(private val stars: List<Star>, private val groupSize: Int = -1) {
      * stars that fits into stars pattern, second is similarity coefficient (0-100.0, where 100.0
      * is 100% similarity).
      */
-    fun find(stars: List<Star>): List<Pair<StarsGroup, Double>> {
+    fun find(stars: HashSet<Star>): HashSet<MapResult> {
         val toFound = StarsGroup(stars)
         initGroups(stars.size)
         val result = groups.associateWith {
             StarsGroupComparator.compare(toFound, it)
-        }.toList().sortedBy { it.second }
-        val withoutRepetitions = arrayListOf<Pair<StarsGroup, Double>>()
-        result.forEach { r ->
+        }
+        val withoutRepetitions = hashSetOf<Pair<StarsGroup, Double>>()
+        result.forEach { entry ->
             withoutRepetitions.map { it.first.stars }.firstOrNull {
-                it.containsAll(r.first.stars)
+                it.containsAll(entry.key.stars)
             }.let {
                 if (it == null) {
-                    withoutRepetitions.add(r)
+                    withoutRepetitions.add(entry.toPair())
                 }
             }
         }
@@ -59,30 +61,25 @@ class Map(private val stars: List<Star>, private val groupSize: Int = -1) {
     }
 
     /**
-     * Returns [groupSize] stars that are closest to the [parentStar] in [stars] list.
-     * Please notice that it can return list with more elements than [groupSize] in case of equal wojciech.osak.distance
+     * Returns [count] stars that are closest to the [parentStar] in [stars] list.
+     * Please notice that it can return list with more elements than [count] in case of equal distances.
      */
-    private fun findClosestStars(parentStar: Star, groupSize: Int): List<Star> {
-        val allStars = stars
-            .map { Pair(distance(parentStar, it), it) }
-            .sortedBy { it.first }
-        val firstMdistances = stars
+    private fun findClosestStars(parentStar: Star, count: Int): HashSet<Star> {
+        return stars
             .asSequence()
-            .associateBy { distance(parentStar, it) }
-            .toList()
-            .map { it.first }
-            .sorted()
-            .take(groupSize)
-            .toList()
-        return allStars.takeWhile { it.first in firstMdistances }.map { it.second }
+            .map { star -> DistanceFromStar(distance(parentStar, star), star) }
+            .sortedBy { it.first }
+            .take(count)
+            .map { it.second }
+            .toHashSet()
     }
 
     private fun initGroups(groupSize: Int) {
         for (star in stars) {
             val group = findClosestStars(star, groupSize)
             if (group.size > groupSize) {
-                group.toSet().combinations(groupSize).forEach { combination ->
-                    groups.add(StarsGroup(combination.toList()))
+                group.combinations(groupSize).forEach { combination ->
+                    groups.add(StarsGroup(combination.toHashSet()))
                 }
             } else {
                 groups.add(StarsGroup(group))
@@ -90,3 +87,9 @@ class Map(private val stars: List<Star>, private val groupSize: Int = -1) {
         }
     }
 }
+
+typealias DistanceFromStar = Pair<Double, Star>
+
+typealias SimilarityCoefficient = Double
+
+typealias MapResult = Pair<StarsGroup, SimilarityCoefficient>

@@ -5,7 +5,7 @@ import com.marcinmoskala.math.combinations
 /**
  * Representation of stars constellation as complete graph.
  */
-data class StarsGroup(val stars: List<Star>) {
+data class StarsGroup(val stars: HashSet<Star>) {
 
     fun asCompleteGraphPairs(): List<StarsLine> {
         return stars.toSet().combinations(2).map {

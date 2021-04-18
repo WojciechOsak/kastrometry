@@ -12,21 +12,21 @@ internal class StarsGroupComparatorTest {
 
     @Test
     fun calculateInnerAnglesRatio() {
-        val triangle = arrayListOf(
+        val triangle = hashSetOf(
             Star(1, 15, "a"),
             Star(3, 15, "b"),
             Star(2, 16, "c")
         )
         val group = StarsGroup(triangle)
         val angles = StarsGroupComparator.calculateInnerAnglesRatio(group)
-        println(group.asCompleteGraphTriples())
+        println(group.asCompleteGraphTriangle())
         println(angles)
-        assertEquals(true, angles.containsAll(arrayListOf(45.0, 45.0, 90.0)))
+        assertEquals(true, angles.containsAll(hashSetOf(45.0, 45.0, 90.0)))
     }
 
     @Test
     fun `calculateInnerAnglesRatio2`() {
-        val triangle = arrayListOf(
+        val triangle = hashSetOf(
             Star(2, 1, "a"),
             Star(7, 1, "b"),
             Star(4.5, 5.33, "c")
@@ -36,13 +36,13 @@ internal class StarsGroupComparatorTest {
             it.round(0)
         }
         assertTrue(
-            angles.containsAll(arrayListOf(60.0, 60.0, 60.0))
+            angles.containsAll(hashSetOf(60.0, 60.0, 60.0))
         )
     }
 
     @Test
     fun `calculateInnerAnglesRatioSquare`() {
-        val square = arrayListOf(
+        val square = hashSetOf(
             Star(0, 10, "a"),
             Star(0, 0, "b"),
             Star(10, 0, "c"),
@@ -50,22 +50,22 @@ internal class StarsGroupComparatorTest {
         )
         val group = StarsGroup(square)
         val angles = StarsGroupComparator.calculateInnerAnglesRatio(group)
-        group.asCompleteGraphTriples().forEach {
+        group.asCompleteGraphTriangle().forEach {
             println(it.toList().map { it.name })
         }
         println(angles)
-        assertEquals(true, angles.containsAll(arrayListOf(90.0, 90.0, 90.0, 90.0))) // it is acceptable
+        assertEquals(true, angles.containsAll(hashSetOf(90.0, 90.0, 90.0, 90.0))) // it is acceptable
     }
 
     @Test
     fun `calculateInnerAnglesRatioFigures`() {
-        val figure1 = arrayListOf(
+        val figure1 = hashSetOf(
             Star(22, 15, "a"),
             Star(22, 17, "b"),
             Star(22, 18, "c"),
             Star(24, 17, "d")
         )
-        val figure2 = arrayListOf(
+        val figure2 = hashSetOf(
             Star(29, 13, "a2"),
             Star(31, 13, "b2"),
             Star(32, 13, "c2"),
@@ -82,7 +82,7 @@ internal class StarsGroupComparatorTest {
 
     @Test
     fun `calculateInnerAnglesRatioRectangle`() {
-        val square = arrayListOf(
+        val square = hashSetOf(
             Star(0, 100, "a"),
             Star(0, 0, "b"),
             Star(10, 0, "c"),
@@ -90,13 +90,13 @@ internal class StarsGroupComparatorTest {
         )
         val group = StarsGroup(square)
         val angles = StarsGroupComparator.calculateInnerAnglesRatio(group)
-        assertEquals(true, angles.containsAll(arrayListOf(90.0, 90.0, 90.0, 90.0))) // it is acceptable
+        assertEquals(true, angles.containsAll(hashSetOf(90.0, 90.0, 90.0, 90.0))) // it is acceptable
     }
 
     @Test
     fun `rotationTest`() {
         val group1 = StarsGroup(
-            arrayListOf(
+            hashSetOf(
                 Star(x = 24.0, y = 17.0, name = "d"),
                 Star(x = 22.0, y = 18.0, name = "c"),
                 Star(x = 22.0, y = 17.0, name = "b")
@@ -105,7 +105,7 @@ internal class StarsGroupComparatorTest {
 
 
         val group2 = StarsGroup(
-            arrayListOf(
+            hashSetOf(
                 Star(x = 31.0, y = 11.0, name = "d2"),
                 Star(x = 32.0, y = 13.0, name = "c2"),
                 Star(x = 31.0, y = 13.0, name = "b2")
@@ -122,14 +122,14 @@ internal class StarsGroupComparatorTest {
     @Test
     fun scaleTest() {
         val triangle = StarsGroup(
-            arrayListOf(
+            hashSetOf(
                 Star(1, 15, "a"),
                 Star(3, 15, "b"),
                 Star(2, 16, "c")
             )
         )
         val triangle2 = StarsGroup(
-            arrayListOf(
+            hashSetOf(
                 Star(1, 15, "a2"),
                 Star(13, 15, "b2"),
                 Star(7, 27, "c2")
